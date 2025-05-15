@@ -35,19 +35,10 @@ set(SOURCES
     FreeImageHelper.cpp
 )
 
-
 link_directories(${FreeImage_LIBRARY_DIR})
 add_executable(exercise_1 ${HEADERS} ${SOURCES})
-
-include_directories("D:/tum/tum_02/IN2354/Libs/FreeImage-3.18.0/Dist/x64")
-include_directories(${FreeImage_INCLUDE_DIR})
-
 target_include_directories(exercise_1 PUBLIC ${EIGEN3_INCLUDE_DIR} ${FreeImage_INCLUDE_DIR})
-# target_link_libraries(exercise_1 general Eigen3::Eigen freeimage)
-link_directories("D:/tum/tum_02/IN2354/Libs/FreeImage-3.18.0/Dist/x64")
-#target_link_libraries(exercise_1 general FreeImage)
-target_link_libraries(exercise_1 general "D:/tum/tum_02/IN2354/Libs/FreeImage-3.18.0/Dist/x64/FreeImage.lib")
-
+target_link_libraries(exercise_1 general Eigen3::Eigen freeimage)
 
 if(WIN32)
     # Visual Studio properties
