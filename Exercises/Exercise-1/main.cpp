@@ -85,8 +85,6 @@ bool WriteMesh(Vertex* vertices, unsigned int width, unsigned int height, const 
 	outFile << nVertices << " " << nFaces << " 0" << std::endl;
 
 	// TODO: save vertices
-
-
 	for (unsigned int i = 0; i < nVertices; ++i) {
 		const Vector4f& pos = vertices[i].position;
 		if (pos.x() == MINF)
@@ -97,7 +95,6 @@ bool WriteMesh(Vertex* vertices, unsigned int width, unsigned int height, const 
 			outFile << " " << (int)col[0] << " " << (int)col[1] << " " << (int)col[2] << " " << (int)col[3] << std::endl;
 		}
 	}
-
 
 	// TODO: save valid faces
 	for (unsigned int y = 0; y < height - 1; ++y) {
@@ -135,7 +132,6 @@ bool WriteMesh(Vertex* vertices, unsigned int width, unsigned int height, const 
 	std::cout << "# list of faces" << std::endl;
 	std::cout << "# nVerticesPerFace idx0 idx1 idx2 ..." << std::endl;
 
-
 	// close file
 	outFile.close();
 
@@ -145,8 +141,8 @@ bool WriteMesh(Vertex* vertices, unsigned int width, unsigned int height, const 
 int main()
 {
 	// Make sure this path points to the data folder
-	// std::string filenameIn = "../Data/rgbd_dataset_freiburg1_xyz/";
-	std::string filenameIn = "D:\\tum\\tum_02\\IN2354\\Data\\rgbd_dataset_freiburg1_xyz\\";
+	std::string filenameIn = "../Data/rgbd_dataset_freiburg1_xyz/";
+	// std::string filenameIn = "D:\\tum\\tum_02\\IN2354\\Data\\rgbd_dataset_freiburg1_xyz\\";
 
 	std::string filenameBaseOut = "mesh_";
 
@@ -212,30 +208,23 @@ int main()
 					continue;
 				}
 
-				// Backproject to camera space
 				float X = (x - cX) * depth / fX;
 				float Y = (y - cY) * depth / fY;
 				float Z = depth;
 
 				Vector4f camPoint(X, Y, Z, 1.0f);
-
-				// Convert to world space
 				Vector4f worldPoint = trajectoryInv * camPoint;
 
 				vertices[idx].position = worldPoint;
 
-				// color (RGBX), each pixel 4 bytes
 				BYTE r = colorMap[4 * idx + 0];
 				BYTE g = colorMap[4 * idx + 1];
 				BYTE b = colorMap[4 * idx + 2];
 				BYTE a = colorMap[4 * idx + 3];
 
 				vertices[idx].color = Vector4uc(r, g, b, a);
-
 			}
 		}
-
-
 
 		// write mesh file
 		std::stringstream ss;
