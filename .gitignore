@@ -22,7 +22,6 @@ Makefile
 
 # Ignore user-generated exercise data
 /Data/
-*.png
 *.jpg
 *.jpeg
 

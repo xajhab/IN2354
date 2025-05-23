@@ -7,6 +7,7 @@ It includes implementations for mesh generation, surface reconstruction, and vol
 
 ## Directory Structure
 
+```
 IN2354/
 ├── Exercise-1/ # RGB-D mesh reconstruction (TUM dataset)
 ├── Exercise-2/ # Surface reconstruction (Sphere, Torus, Hoppe, RBF)
@@ -14,7 +15,7 @@ IN2354/
 ├── Data/ # Input datasets (e.g., TUM RGB-D, point clouds)
 ├── media/ # Screenshots used in this README (for visualization only)
 └── .gitignore
-
+```
 
 ## Build Instructions
 
