@@ -1,18 +1,36 @@
-# TUM IN2354 – Exercise 1: 3D Mesh from RGB-D
+# TUM IN2354 – 3D Scanning and Motion Capture (Exercises)
 
-This repository contains the full setup to generate OFF meshes from depth+color images using the TUM RGB-D SLAM dataset.
+This repository contains all programming exercises for the course **IN2354 – 3D Scanning and Motion Capture** at TUM.  
+It includes implementations for mesh generation, surface reconstruction, and volumetric methods.
 
-## Structure
+---
 
-- `Exercises/Exercise-1/`: Code to run Exercise 1 (main.cpp, helper headers)
-- `Libs/`: Includes Eigen and FreeImage
-- `Data/`: Place to put your dataset (e.g., `rgbd_dataset_freiburg1_xyz/`)
-- `.gitignore`: Prevents tracking build/data artifacts
+## Directory Structure
 
-## Build
+IN2354/
+├── Exercise-1/ # RGB-D mesh reconstruction (TUM dataset)
+├── Exercise-2/ # Surface reconstruction (Sphere, Torus, Hoppe, RBF)
+├── Libs/ # External libraries (e.g., Eigen, FreeImage)
+├── Data/ # Input datasets (e.g., TUM RGB-D, point clouds)
+├── media/ # Screenshots used in this README (for visualization only)
+└── .gitignore
+
+
+## Build Instructions
 
 ```bash
-cd Exercises/Exercise-1
+cd Exercise-X
 mkdir build && cd build
 cmake ..
-cmake --build . --config Release
+cmake --build .
+Modify main.cpp to switch between tasks if applicable.
+```
+
+##  Visual Results 
+### Exercise 2
+| Method | Visualization           |
+| ------ | ----------------------- |
+| Sphere | ![](./media/sphere.png) |
+| Torus  | ![](./media/torus.png)  |
+| Hoppe  | ![](./media/hoppe.png)  |
+| RBF    | ![](./media/rbf.png)    |

@@ -7,7 +7,7 @@
 
 int main()
 {
-	std::string filenameIn = "D:/tum/tum_02/IN2354/Data/normalized.pcb";
+	std::string filenameIn = "../../Data/normalized.pcb";
 	std::string filenameOut = "result.off";
 
 	// implicit surface
