@@ -9,8 +9,8 @@
 int alignBunnyWithProcrustes() {
 	// Load the source and target mesh.
 	// Make sure the paths are correct.
-	const std::string filenameSource = std::string("/config/workspace/Data/bunny_trans.off");
-	const std::string filenameTarget = std::string("/config/workspace/Data/bunny.off");
+	const std::string filenameSource = std::string("/../../Data/bunny_trans.off");
+	const std::string filenameTarget = std::string("/../../Data/bunny.off");
 
 	SimpleMesh sourceMesh;
 	if (!sourceMesh.loadMesh(filenameSource)) {
