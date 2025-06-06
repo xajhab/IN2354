@@ -8,6 +8,8 @@ IN2354/
 ├── Exercise-1/ # RGB-D mesh reconstruction
 ├── Exercise-2/ # Surface reconstruction
 ├── Exercise-3/ # Optimization with Ceres
+├── Exercise-4/ # Coarse Alignment (Procrustes)
+├── Exercise-5/
 ├── Libs/
 ├── Data/
 ├── media/
@@ -108,14 +110,21 @@ git push --force origin Bang
 ```
 
 ##  Visual Results 
+
+### Exercise 1
+
+| Task   | Visualization               |
+| ------ | --------------------------- |
+| Meshes | ![](./Media/snapshot00.png) |
+
 ### Exercise 2
+
 | Method | Visualization           |
 | ------ | ----------------------- |
 | Sphere | ![](./Media/sphere.png) |
 | Torus  | ![](./Media/torus.png)  |
 | Hoppe  | ![](./Media/hoppe.png)  |
 | RBF    | ![](./Media/rbf.png)    |
-
 
 ### Exercise 3
 
@@ -125,5 +134,13 @@ git push --force origin Bang
 | Task 2  | ![](./Media/surface.png)  | [`output_surface.txt`](./Media/output_surface.txt)   |
 | Task 3  | ![](./Media/dragon.png)   | [`output_dragon.txt`](./Media/output_dragon.txt)     |
 
+### Exercise 4
 
+| Task             | Visualization                     |
+| ---------------- | --------------------------------- |
+| Bunny procrustes | ![](./Media/bunny_procrustes.png) |
 
+### Exercise 5
+
+| Task             | Visualization                     |
+| ---------------- | --------------------------------- |
