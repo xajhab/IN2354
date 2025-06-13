@@ -111,9 +111,21 @@ public:
         // class.
         // Important: Ceres automatically squares the cost function.
 
-        residuals[0] = T(0);
-		residuals[1] = T(0);
-		residuals[2] = T(0);
+        // residuals[0] = T(0);
+		// residuals[1] = T(0);
+		// residuals[2] = T(0);
+        
+        PoseIncrement<T> poseIncrement(const_cast<T*>(pose));
+
+        T source[3];
+        fillVector<T>(m_sourcePoint, source);
+
+        T transformed[3];
+        poseIncrement.apply(source, transformed);
+
+        residuals[0] = T(m_weight) * (transformed[0] - T(m_targetPoint[0]));
+        residuals[1] = T(m_weight) * (transformed[1] - T(m_targetPoint[1]));
+        residuals[2] = T(m_weight) * (transformed[2] - T(m_targetPoint[2]));
 
         return true;
     }
@@ -148,7 +160,25 @@ public:
         // class.
         // Important: Ceres automatically squares the cost function.
 
-        residuals[0] = T(0);
+        // residuals[0] = T(0);
+
+        PoseIncrement<T> poseIncrement(const_cast<T*>(pose));
+
+        T source[3];
+        fillVector<T>(m_sourcePoint, source);
+
+        T transformed[3];
+        poseIncrement.apply(source, transformed);
+
+        T diff[3];
+        diff[0] = transformed[0] - T(m_targetPoint[0]);
+        diff[1] = transformed[1] - T(m_targetPoint[1]);
+        diff[2] = transformed[2] - T(m_targetPoint[2]);
+
+        T normal[3];
+        fillVector<T>(m_targetNormal, normal);
+
+        residuals[0] = T(m_weight) * (diff[0] * normal[0] + diff[1] * normal[1] + diff[2] * normal[2]);
 
         return true;
     }
@@ -235,7 +265,11 @@ protected:
                 const auto& targetNormal = targetNormals[match.idx];
 
                 // TODO: Invalidate the match (set it to -1) if the angle between the normals is greater than 60
-                
+                float dot = sourceNormal.dot(targetNormal);
+                float angle = std::acos(std::min(1.0f, std::max(-1.0f, dot))); // Clamp to avoid NaN
+                if (angle > M_PI / 3.0f) { // 60 degrees in radians
+                    match.idx = -1;
+                }                
             }
         }
     }
@@ -329,7 +363,11 @@ private:
 
                 // TODO: Create a new point-to-point cost function and add it as constraint (i.e. residual block) 
                 // to the Ceres problem.
-
+                problem.AddResidualBlock(
+                    PointToPointConstraint::create(sourcePoint, targetPoint, 1.0f),
+                    nullptr,
+                    poseIncrement.getData()
+                );
 
                 if (m_bUsePointToPlaneConstraints) {
                     const auto& targetNormal = targetNormals[match.idx];
@@ -339,8 +377,11 @@ private:
 
                     // TODO: Create a new point-to-plane cost function and add it as constraint (i.e. residual block) 
                     // to the Ceres problem.
-
-
+                    problem.AddResidualBlock(
+                        PointToPlaneConstraint::create(sourcePoint, targetPoint, targetNormal, 1.0f),
+                        nullptr,
+                        poseIncrement.getData()
+                    );
                 }
             }
         }
@@ -427,19 +468,39 @@ private:
             const auto& n = targetNormals[i];
 
             // TODO: Add the point-to-plane constraints to the system
-
+            unsigned row = 4 * i;
+            Vector3f diff = d - s;
+            Vector3f cross = s.cross(n);
+            A.block<1, 3>(row, 0) = n.transpose() * cross.asDiagonal();  // cross(θ) ⋅ n
+            A.block<1, 3>(row, 3) = n.transpose();                        // n ⋅ t
+            b(row) = n.dot(diff);                                        // n ⋅ (d - s)
 
             // TODO: Add the point-to-point constraints to the system
+            // x
+            A.block<1, 3>(row + 1, 0) = RowVector3f::Zero();
+            A.block<1, 3>(row + 1, 3) = RowVector3f::UnitX();
+            b(row + 1) = d.x() - s.x();
 
+            // y
+            A.block<1, 3>(row + 2, 0) = RowVector3f::Zero();
+            A.block<1, 3>(row + 2, 3) = RowVector3f::UnitY();
+            b(row + 2) = d.y() - s.y();
+
+            // z
+            A.block<1, 3>(row + 3, 0) = RowVector3f::Zero();
+            A.block<1, 3>(row + 3, 3) = RowVector3f::UnitZ();
+            b(row + 3) = d.z() - s.z();
 
             //TODO: Optionally, apply a higher weight to point-to-plane correspondences
-
+            float w = 10.0f;
+            A.block<1, 6>(row, 0) *= w;
+            b(row) *= w;
 
         }
 
         // TODO: Solve the system
-        VectorXf x(6);
-
+        // VectorXf x(6);
+        VectorXf x = A.colPivHouseholderQr().solve(b);
 
         float alpha = x(0), beta = x(1), gamma = x(2);
 
@@ -452,7 +513,8 @@ private:
 
         // TODO: Build the pose matrix using the rotation and translation matrices
         Matrix4f estimatedPose = Matrix4f::Identity();
-
+        estimatedPose.block<3, 3>(0, 0) = rotation;
+        estimatedPose.block<3, 1>(0, 3) = translation;
 
         return estimatedPose;
     }

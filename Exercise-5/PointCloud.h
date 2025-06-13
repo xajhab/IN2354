@@ -82,8 +82,25 @@ public:
                 }
 
                 // TODO: Compute the normals using central differences. 
-                normalsTmp[idx] = Vector3f(1, 1, 1); // Needs to be replaced.
-                normalsTmp[idx].normalize();
+                // normalsTmp[idx] = Vector3f(1, 1, 1); // Needs to be replaced.
+                // normalsTmp[idx].normalize();
+                
+                const Vector3f& p_ijm1 = pointsTmp[idx - 1];           // left
+                const Vector3f& p_ijp1 = pointsTmp[idx + 1];           // right
+                const Vector3f& p_im1j = pointsTmp[idx - width];       // top
+                const Vector3f& p_ip1j = pointsTmp[idx + width];       // bottom
+                
+                if (!p_ijm1.allFinite() || !p_ijp1.allFinite() || !p_im1j.allFinite() || !p_ip1j.allFinite()) {
+                    normalsTmp[idx] = Vector3f(MINF, MINF, MINF);
+                    continue;
+                }
+
+                Vector3f du_vec = p_ijp1 - p_ijm1;
+                Vector3f dv_vec = p_ip1j - p_im1j;
+                Vector3f normal = du_vec.cross(dv_vec);
+                normal.normalize();
+                normalsTmp[idx] = normal;
+
             }
         }
 
