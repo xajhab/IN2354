@@ -12,8 +12,8 @@
 #define USE_POINT_TO_PLANE	0
 #define USE_LINEAR_ICP		0
 
-#define RUN_SHAPE_ICP		0
-#define RUN_SEQUENCE_ICP	1
+#define RUN_SHAPE_ICP		1
+#define RUN_SEQUENCE_ICP	0
 
 void debugCorrespondenceMatching() {
 	// Load the source and target mesh.

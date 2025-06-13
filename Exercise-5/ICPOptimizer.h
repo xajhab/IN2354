@@ -266,8 +266,7 @@ protected:
 
                 // TODO: Invalidate the match (set it to -1) if the angle between the normals is greater than 60
                 float dot = sourceNormal.dot(targetNormal);
-                float angle = std::acos(std::min(1.0f, std::max(-1.0f, dot))); // Clamp to avoid NaN
-                if (angle > M_PI / 3.0f) { // 60 degrees in radians
+                if (dot > M_PI / 3.0f) { // 60 degrees in radians
                     match.idx = -1;
                 }                
             }
@@ -468,33 +467,24 @@ private:
             const auto& n = targetNormals[i];
 
             // TODO: Add the point-to-plane constraints to the system
-            unsigned row = 4 * i;
-            Vector3f diff = d - s;
-            Vector3f cross = s.cross(n);
-            A.block<1, 3>(row, 0) = n.transpose() * cross.asDiagonal();  // cross(θ) ⋅ n
-            A.block<1, 3>(row, 3) = n.transpose();                        // n ⋅ t
-            b(row) = n.dot(diff);                                        // n ⋅ (d - s)
+            A(4 * i, 0) = s.y() * n.z() - s.z() * n.y(); // ∂/∂α (rotation around X)
+            A(4 * i, 1) = s.z() * n.x() - s.x() * n.z(); // ∂/∂β (rotation around Y)
+            A(4 * i, 2) = s.x() * n.y() - s.y() * n.x(); // ∂/∂γ (rotation around Z)
+            A(4 * i, 3) = n.x(); // ∂/∂t_x
+            A(4 * i, 4) = n.y(); // ∂/∂t_y
+            A(4 * i, 5) = n.z(); // ∂/∂t_z
+            b(4 * i) = n.dot(d - s);
 
             // TODO: Add the point-to-point constraints to the system
-            // x
-            A.block<1, 3>(row + 1, 0) = RowVector3f::Zero();
-            A.block<1, 3>(row + 1, 3) = RowVector3f::UnitX();
-            b(row + 1) = d.x() - s.x();
-
-            // y
-            A.block<1, 3>(row + 2, 0) = RowVector3f::Zero();
-            A.block<1, 3>(row + 2, 3) = RowVector3f::UnitY();
-            b(row + 2) = d.y() - s.y();
-
-            // z
-            A.block<1, 3>(row + 3, 0) = RowVector3f::Zero();
-            A.block<1, 3>(row + 3, 3) = RowVector3f::UnitZ();
-            b(row + 3) = d.z() - s.z();
+            A.block<1, 6>(4 * i + 1, 0) << 0,  s.z(), -s.y(), 1, 0, 0; // x
+            A.block<1, 6>(4 * i + 2, 0) << -s.z(), 0,  s.x(), 0, 1, 0; // y
+            A.block<1, 6>(4 * i + 3, 0) << s.y(), -s.x(), 0, 0, 0, 1;  // z
+            b.segment<3>(4 * i + 1) = d - s;
 
             //TODO: Optionally, apply a higher weight to point-to-plane correspondences
-            float w = 10.0f;
-            A.block<1, 6>(row, 0) *= w;
-            b(row) *= w;
+            float planeWeight = 10.0f;
+            A.row(4 * i) *= planeWeight;
+            b(4 * i) *= planeWeight;
 
         }
 
