@@ -9,7 +9,7 @@ IN2354/
 ├── Exercise-2/ # Surface reconstruction
 ├── Exercise-3/ # Optimization with Ceres
 ├── Exercise-4/ # Coarse Alignment (Procrustes)
-├── Exercise-5/
+├── Exercise-5/ # ICP Optimization
 ├── Libs/
 ├── Data/
 ├── media/
@@ -28,70 +28,6 @@ Modify main.cpp to switch between tasks if applicable.
 
 ### Personal Tips
 
-```bash
-cd Exercise-1
-mkdir build
-cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/Users/xajha/DevTools/vcpkg/scripts/buildsystems/vcpkg.cmake -DEigen3_DIR=../Libs/eigen-3.4.0/cmake
-cmake --build .
-
-
-cmake .. `  -DCMAKE_PREFIX_PATH="C:/Users/xajha/DevTools/vcpkg/installed/x64-windows;D:/tum/tum_02/IN2354/Libs/Glog;D:/tum/tum_02/IN2354/Libs/Ceres" `  -DEigen3_DIR="D:/tum/tum_02/IN2354/Libs/Eigen/cmake" `  -DCeres_DIR="D:/tum/tum_02/IN2354/Libs/Ceres/lib/cmake/Ceres" `  -Dglog_USE_STATIC_LIBS=ON    
-
-
-cmake .. `
-  -DCMAKE_INSTALL_PREFIX=../../Ceres `
-  -DEigen3_DIR=../../Eigen/cmake `
-  -DCMAKE_PREFIX_PATH="C:/Users/xajha/DevTools/vcpkg/installed/x64-windows" `
-  -DBUILD_EXAMPLES=OFF `
-  -DBUILD_BENCHMARKS=OFF `
-  -DBUILD_TESTING=OFF `
-  -DGFLAGS=OFF `
-  -DLAPACK=OFF `
-  -DCUSTOM_BLAS=OFF `
-  -DSUITESPARSE=OFF
-```
-
-#### Clone and bootstrap vcpkg
-```bash
-git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.bat
-```
-
-#### Install required libraries via vcpkg
-```bash
-vcpkg install eigen3:x64-windows
-vcpkg install glog:x64-windows
-vcpkg install ceres:x64-windows
-```
-
-#### Configure CMake with fixed library paths
-```bash
-cmake .. ^
-  -DCMAKE_PREFIX_PATH="C:/Users/xajha/DevTools/vcpkg/installed/x64-windows;D:/tum/tum_02/IN2354/Libs/Glog;D:/tum/tum_02/IN2354/Libs/Ceres" ^
-  -DEigen3_DIR="D:/tum/tum_02/IN2354/Libs/Eigen/cmake" ^
-  -DCeres_DIR="D:/tum/tum_02/IN2354/Libs/Ceres/lib/cmake/Ceres"
-```
-
-#### Build all exercises
-```bash
-cmake --build .
-```
-
-#### Fix missing DLLs (Debug mode)
-```bash
-copy D:\tum\tum_02\IN2354\Libs\Glog\bin\glogd.dll D:\tum\tum_02\IN2354\Exercise-3\build\Debug\
-```
-
-#### Run executables
-```bash
-cd build
-.\Debug\gaussian.exe
-.\Debug\surface.exe
-.\Debug\dragon.exe
-```
-
 #### Generate plots and result files
 ```bash
 python plot_gaussian.py --mu 1.57729 --sigma 0.605089
@@ -99,14 +35,19 @@ python plot_surface.py
 python plot_dragon.py --deg 41.9745 --tx 1247.91 --ty 507.993
 ```
 
-#### Git conflict handling to keep full local version
+#### Dependencies via vcpkg
+
+Installed packages (x64-windows triplet):
+
+- `eigen3`
+- `ceres`
+- `glog`
+- `lz4`
+- `flann`
+
+Toolchain file passed to CMake:
 ```bash
-git stash
-git checkout Bang
-git stash pop
-git add -A
-git commit -m "Keep full local version of IN2354 directory and resolve all stash merge conflicts"
-git push --force origin Bang
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=C:/Users/xajha/DevTools/vcpkg/scripts/buildsystems/vcpkg.cmake
 ```
 
 ##  Visual Results 
@@ -144,3 +85,4 @@ git push --force origin Bang
 
 | Task             | Visualization                     |
 | ---------------- | --------------------------------- |
+| Bunny procrustes | ![](./Media/merged_output.png) |
